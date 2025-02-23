@@ -22,7 +22,7 @@ const PositionUpdateChoose = () => {
       <h2 className="text-2xl font-semibold text-gray-900 mb-8">
         更新岗位
       </h2>
-      <div className="flex flex-wrap w-full gap-10">
+      <div className="flex flex-wrap gap-4">
         {allPositions.map((position: any, index: number) => (
           <InfoCard
             key={position.id || index}

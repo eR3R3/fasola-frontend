@@ -14,7 +14,7 @@ import {Briefcase, CircleUserRound, House, UsersRound} from "lucide-react"
 import Link from "next/link";
 
 interface InfoCardProp{
-  type: "users"|"positions"|"clubs"|"miniClubs",
+  type: "users"|"positions"|"clubs"|"miniClubs"|"miniTests"|"tests"|"questions",
   name: string,
   description0: string,
   description1?: string,
@@ -32,7 +32,10 @@ const languageMap={
   "clubs": "部门",
   "positions":"岗位",
   "users":"员工",
-  "miniClubs":"小组"
+  "miniClubs":"小组",
+  "miniTests":"小测试",
+  "tests": "测试",
+  "questions":"问题"
 }
 
 const InfoCard = ({type, name, description0, description1, content}: InfoCardProp) => {
@@ -57,7 +60,7 @@ const InfoCard = ({type, name, description0, description1, content}: InfoCardPro
                 key={index}
                 className="flex items-start py-3 first:pt-0 last:pb-0"
               >
-                {(type==="miniClubs"||type==="positions"||type==="users")&&(
+                {(type==="miniClubs"||type==="positions"||type==="users"||type=="questions")&&(
                   <div>
                   <div className="w-2/3 flex flex-wrap gap-2">
                     {item?.value?.map((val, valIndex) => (
@@ -95,6 +98,26 @@ const InfoCard = ({type, name, description0, description1, content}: InfoCardPro
                   </div>
                 )}
 
+                {(type === "miniTests" || type==="tests")&& (
+                  <div className="flex flex-row items-center space-x-4 w-full overflow-hidden">
+                    <h2 className="flex-shrink-0 w-1/3 text-sm font-bold text-gray-700 whitespace-nowrap truncate">
+                      {item?.key}
+                    </h2>
+                    <div className="flex-1 flex flex-wrap gap-2 min-w-0">
+                      {item?.value.map((val, valIndex) => (
+                        <div
+                          key={valIndex}
+                          className="inline-flex items-center text-sm text-gray-600
+                     bg-gray-50 px-3 py-1 rounded-md
+                     hover:bg-gray-100 transition-colors duration-200
+                     whitespace-nowrap flex-shrink-0"
+                        >
+                          {val}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
 
               </div>
@@ -110,7 +133,7 @@ const InfoCard = ({type, name, description0, description1, content}: InfoCardPro
               })
               window.location.reload()
             }}>删除{languageMap[type]}</Button>
-            <Button type="submit" variant="shadow" onPressEnd={()=>{router.push(`/admin/update/${type}/${name}`)}}>更新</Button>
+            <Button type="button" variant="shadow" onPressEnd={()=>{router.push(`/admin/update/${type}/${name}`)}}>更新</Button>
           </div>
         </CardFooter>
       </Card>

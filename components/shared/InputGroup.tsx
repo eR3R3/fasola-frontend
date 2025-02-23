@@ -15,7 +15,6 @@ interface InputGroupProp<T extends FieldValues> {
 const InputGroup = <T extends FieldValues>({name, label}: InputGroupProp<T>) => {
   const methods = useFormContext<FormData>();
 
-
   const {fields, append, remove} = useFieldArray({
     control: methods.control,
     // @ts-ignore
@@ -24,8 +23,8 @@ const InputGroup = <T extends FieldValues>({name, label}: InputGroupProp<T>) => 
 
   return (
     <div className="w-full space-y-4 pt-8">
-      <div className="">
-        <FormLabel className="text-lg font-bold ">{label}</FormLabel>
+      <div className="w-full">
+        <FormLabel className="text-lg font-bold w-full ">{label}</FormLabel>
         {fields.map((field, index) => (
           <div key={field.id} className="group flex w-full items-center gap-2 relative  rounded-lg  transition-colors">
             <FormField
@@ -42,14 +41,14 @@ const InputGroup = <T extends FieldValues>({name, label}: InputGroupProp<T>) => 
                     label={label}
                     className=" bg-transparent border-b border-gray-200
                              focus:border-gray-500
-                             transition-colors min-w-[330px]"
+                             transition-colors min-w-[400px]"
                     onClear={() => field.onChange("")}
                   />
                 </div>
               )}
             />
 
-            <CircleMinus className="h-6 w-6 " onClick={() => remove(index)}/>
+            <CircleMinus className="h-6 w-6 text-red-500" onClick={() => remove(index)}/>
           </div>
         ))}
         <FormMessage className="text-sm text-red-500 font-medium" />

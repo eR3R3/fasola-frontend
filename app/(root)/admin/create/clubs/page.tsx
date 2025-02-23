@@ -8,7 +8,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessa
 import {Input} from "@heroui/input";
 import InputGroup from "@/components/shared/InputGroup";
 import {Button} from "@heroui/button";
-import {toast, useToast} from "@/hooks/use-toast";
+import {useToast} from "@/hooks/use-toast";
 import {useRouter} from "next/navigation";
 
 const CreateClub = () => {
@@ -52,7 +52,7 @@ const CreateClub = () => {
         title: "成功",
         description: "成功创建部门",
       })
-      router.push('/')
+      router.push('/admin/update/clubs')
     }
     console.log(createdClub)
   }
@@ -61,12 +61,12 @@ const CreateClub = () => {
 
   return (
     <FormProvider {...methods}>
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+      <div className="bg-white w-full rounded-lg shadow-sm p-8">
+        <h2 className="text-2xl w-full font-semibold text-gray-900 mb-8">
           创建部门
         </h2>
 
-        <form className="space-y-8" onSubmit={methods.handleSubmit(onSubmit)}>
+        <form className="space-y-8 w-full" onSubmit={methods.handleSubmit(onSubmit)}>
           {/* Basic Info Card */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">基本信息</h3>
@@ -97,9 +97,9 @@ const CreateClub = () => {
           </div>
 
           {/* Department Details Card */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 ">部门详情</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white w-full rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg w-full font-medium text-gray-900 ">部门详情</h3>
+            <div className="flex gap-6">
               <div>
                 <InputGroup<formDataType>
                   name="positions"

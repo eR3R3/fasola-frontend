@@ -9,10 +9,11 @@ interface UserCreateInputFieldProp<T extends FieldValues>{
   name: FieldPath<T>
   label: string,
   description?: string,
+  haveTitle?: boolean,
   width?: number
 }
 
-const InputField = <T extends FieldValues>({name, label, description, width}:UserCreateInputFieldProp<T>) => {
+const InputField = <T extends FieldValues>({name, label, description, width, haveTitle=true}:UserCreateInputFieldProp<T>) => {
 
   const methods = useFormContext()
 
@@ -22,7 +23,7 @@ const InputField = <T extends FieldValues>({name, label, description, width}:Use
     control={methods.control}
     render={({field})=>(
       <div className="w-full">
-        <FormLabel className="text-lg font-bold ">{label}</FormLabel>
+        {haveTitle&&<FormLabel className="w-full text-lg font-bold">{label}</FormLabel>}
         <FormItem className="w-full">
           <FormControl>
             <Input
@@ -32,7 +33,7 @@ const InputField = <T extends FieldValues>({name, label, description, width}:Use
               label={label}
               className={`bg-transparent border-b border-gray-200
                           focus:border-gray-500 w-full
-                          transition-colors min-w-[${width}]`}
+                          transition-colors `}
               onClear={() => field.onChange("")}
             />
           </FormControl>

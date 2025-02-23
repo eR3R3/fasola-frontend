@@ -1,16 +1,17 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/shared/InputField";
 import { Button } from "@heroui/button";
 import { toast, useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-const CreateQuestion = () => {
+const UpdateQuestion = () => {
   const { toast } = useToast()
+  const params = useParams()
   const router = useRouter()
 
   const zodSchema = z.object({
@@ -28,10 +29,22 @@ const CreateQuestion = () => {
     }
   });
 
+  useEffect(() => {
+    async function fetchQuestion() {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/questions/findOne/${params.name}`);
+      const data = await response.json();
+      methods.reset({
+        name: data.name,
+        content: data.content,
+      });
+    }
+    fetchQuestion();
+  }, [params.name, methods]);
+
   async function onSubmit(data: formDataType) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/questions/create`, {
-        method: "POST",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/questions/update/${params.name}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
@@ -47,15 +60,15 @@ const CreateQuestion = () => {
         toast({
           variant: "default",
           title: "成功",
-          description: "成功创建问题",
+          description: "成功更新问题",
         });
         router.push('/admin/update/questions');
       }
     } catch (error) {
       toast({
-        variant: "destructive",
+        variant: "default",
         title: "错误",
-        description: "创建问题失败",
+        description: "更新问题失败",
       });
     }
   }
@@ -64,7 +77,7 @@ const CreateQuestion = () => {
     <FormProvider {...methods}>
       <div className="bg-white rounded-lg shadow-sm p-8">
         <h2 className="text-2xl font-semibold text-gray-900 mb-8">
-          创建问题
+          更新问题
         </h2>
 
         <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-8">
@@ -87,7 +100,7 @@ const CreateQuestion = () => {
 
           <div className="flex justify-end mt-8">
             <Button type="submit" variant="shadow">
-              提交
+              更新
             </Button>
           </div>
         </form>
@@ -96,4 +109,4 @@ const CreateQuestion = () => {
   );
 };
 
-export default CreateQuestion; 
+export default UpdateQuestion; 

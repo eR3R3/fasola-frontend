@@ -9,6 +9,7 @@ import { Button } from "@heroui/button";
 import { toast, useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AutoCompleteField from "@/components/shared/AutoCompleteField";
+import { CircleMinus } from "lucide-react";
 
 const CreateMiniTest = () => {
   const { toast } = useToast()
@@ -17,9 +18,15 @@ const CreateMiniTest = () => {
 
   const zodSchema = z.object({
     name: z.string().min(1, "小测试名称不能为空"),
-    questions: z.array(z.object({
-      content: z.string(),
-      proportion: z.number().min(0).max(1)
+    question: z.array(z.object({
+      name: z.string().min(1, "问题名称不能为空"),
+      proportion: z.string().refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0 && num <= 1;
+        },
+        "占比必须在0到1之间"
+      )
     })).min(1, "至少需要一个问题")
   });
 
@@ -29,7 +36,7 @@ const CreateMiniTest = () => {
     resolver: zodResolver(zodSchema),
     defaultValues: {
       name: "",
-      questions: [{content: "", proportion: 0}]
+      question: [{name: "", proportion: "0"}]
     }
   });
 
@@ -37,23 +44,67 @@ const CreateMiniTest = () => {
     async function fetchQuestions() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/questions/findAll`);
       const data = await response.json();
-      setAllQuestions(data.map((q: any) => q.content));
+      setAllQuestions(data.map((q: any) => q.name));
     }
     fetchQuestions();
   }, []);
 
+  const removeQuestion = (index: number) => {
+    const currentQuestions = methods.getValues('question');
+    if (currentQuestions.length > 1) {
+      methods.setValue('question', 
+        currentQuestions.filter((_, i) => i !== index)
+      );
+    } else {
+      toast({
+        variant: "default",
+        title: "提示",
+        description: "至少需要保留一个问题",
+      });
+    }
+  };
+
   async function onSubmit(data: formDataType) {
     try {
+      const totalProportion = data.question.reduce(
+        (sum, q) => sum + parseFloat(q.proportion), 
+        0
+      );
+      
+      if (Math.abs(totalProportion - 1) > 0.01) {
+        toast({
+          variant: "destructive",
+          title: "错误",
+          description: "所有问题的占比之和必须等于1",
+        });
+        return;
+      }
+
+      const updatedData = {
+        name: data.name,
+        question: data.question.map(q => ({
+          name: q.name,
+          proportion: parseFloat(q.proportion)
+        }))
+      };
+
+      console.log('Submitting data:', updatedData);
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/miniTests/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(updatedData)
       });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
       const result = await response.json();
       
       if (result.message) {
         toast({
-          variant: "default",
+          variant: "destructive",
           title: "错误",
           description: result.message,
         });
@@ -63,9 +114,10 @@ const CreateMiniTest = () => {
           title: "成功",
           description: "成功创建小测试",
         });
-        router.push('/');
+        router.push('/admin/update/miniTests');
       }
     } catch (error) {
+      console.error('Submit error:', error);
       toast({
         variant: "destructive",
         title: "错误",
@@ -93,28 +145,42 @@ const CreateMiniTest = () => {
 
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-6">问题信息</h3>
+            <div className="flex items-center">
+              <div className="text-lg font-medium text-gray-700 w-[45%]">问题内容</div>
+              <div className="text-lg font-medium text-gray-700 w-[45%]">占比</div>
+              <div className="w-[5%]"></div>
+            </div>
             <div className="space-y-4">
-              {methods.watch('questions')?.map((_, index) => (
-                <div key={index} className="grid grid-cols-2 gap-4">
-                  <AutoCompleteField
-                    name={`questions.${index}.content`}
-                    label="问题内容"
-                    items={allQuestions}
-                    description="选择问题"
-                  />
-                  <InputField
-                    name={`questions.${index}.proportion`}
-                    label="占比"
-                    description="输入0-1之间的数字"
-                  />
+              {methods.watch('question')?.map((_, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <div className="w-[45%]">
+                    <AutoCompleteField
+                      name={`question.${index}.name`}
+                      label="问题内容"
+                      haveTitle={false}
+                      items={allQuestions}
+                      description="选择问题"
+                    />
+                  </div>
+                  <div className="w-[45%]">
+                    <InputField
+                      name={`question.${index}.proportion`}
+                      haveTitle={false}
+                      label="占比"
+                      description="输入0-1之间的数字"
+                    />
+                  </div>
+                  <div className="w-[10%] flex justify-center">
+                    <CircleMinus className="h-6 w-6 text-red-500 cursor-pointer" onClick={() => removeQuestion(index)}/>
+                  </div>
                 </div>
               ))}
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => methods.setValue('questions', [
-                  ...methods.getValues('questions'),
-                  { content: "", proportion: 0 }
+                onPress={() => methods.setValue('question', [
+                  ...methods.getValues('question'),
+                  { name: "", proportion: "0" }
                 ])}
               >
                 添加问题

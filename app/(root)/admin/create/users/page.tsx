@@ -66,7 +66,7 @@ const CreateUsers = () => {
         title: "成功",
         description: "成功创建用户",
       })
-      router.push('/')
+      router.push('/admin/update/users')
     }
     console.log(createdUser)
   }

@@ -25,7 +25,7 @@ const AutoCompleteGroup = <T extends FieldValues>({name, label, items}: InputGro
   });
 
   return (
-    <div className="w-full space-y-4 pt-8">
+    <div className="w-full space-y-4">
       <div className="">
         <FormLabel className="text-lg font-bold ">{label}</FormLabel>
         {fields.map((field, index) => (

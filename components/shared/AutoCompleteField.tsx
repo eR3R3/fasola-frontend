@@ -14,7 +14,7 @@ interface UserCreateInputFieldProp<T extends FieldValues>{
   items: string[]
 }
 
-const InputField = <T extends FieldValues>({name, label, description, items=[], haveTitle=true, width}:UserCreateInputFieldProp<T>) => {
+const AutoCompleteField = <T extends FieldValues>({name, label, description, items=[], haveTitle=true, width}:UserCreateInputFieldProp<T>) => {
   const methods = useFormContext();
 
   return (
@@ -54,4 +54,4 @@ const InputField = <T extends FieldValues>({name, label, description, items=[], 
   );
 };
 
-export default InputField;
+export default AutoCompleteField;

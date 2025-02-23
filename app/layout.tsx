@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 import SideBar from "@/components/shared/SideBar"
 import {Toaster} from "@/components/ui/toaster";
 
@@ -26,21 +34,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-      <SidebarProvider className="w-screen">
-        <SideBar />
-        <main className="w-full">
-          <SidebarTrigger />
-          <div className="px-10 py-6 w-full">
+    <ClerkProvider afterSignOutUrl='/' appearance={{variables:{ colorPrimary:'#6ce986'}}}>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <main>
             {children}
-          </div>
-        </main>
-        <Toaster />
-      </SidebarProvider>
-      </body>
-    </html>
+          </main>
+          <Toaster></Toaster>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
