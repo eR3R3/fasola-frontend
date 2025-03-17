@@ -11,7 +11,8 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import SideBar from "@/components/shared/SideBar"
-import {Toaster} from "@/components/ui/toaster";
+import { Toaster as UIToaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +43,8 @@ export default function RootLayout({
           <main>
             {children}
           </main>
-          <Toaster></Toaster>
+          <UIToaster />
+          <Toaster position="top-right" richColors />
         </body>
       </html>
     </ClerkProvider>

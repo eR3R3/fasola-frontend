@@ -20,33 +20,36 @@ const AssessmentPage = () => {
 
   useEffect(() => {
     const fetchAssessments = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/assignments/findAll`);
-      const data = await response.json();
-      setAssessments(data.map((each: any)=>(
-        {
-          name: each.test.name,
-          status: each.status,
-          reviewee: each.reviewee.name
-        }
-      )));
-      console.log(data)
-    }
-    fetchAssessments();
-    setAssessments([
-      {
-        id: "1",
-        name: "2024年第一季度测评",
-        deadline: "2024-03-31",
-        status: "pending"
-      },
-      {
-        id: "2",
-        name: "2023年第四季度测评",
-        deadline: "2023-12-31",
-        status: "completed"
+      if (!user) return;
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/getTestData/${user?.firstName+user?.lastName}`);
+        const data = await response.json();
+        console.log(data)
+        // Properly map the data to ensure all properties are strings
+        const formattedData = data.map((each: any) => ({
+          id: each.id || String(Math.random()),
+          name: typeof each.test === 'object' && each.test ? each.test.name : 'Unnamed Test',
+          status: each.status || 'pending',
+          reviewee: typeof each.reviewee === 'object' && each.reviewee ? each.reviewee.name : 'Unnamed User',
+        }));
+        
+        setAssessments(formattedData);
+      } catch (error) {
+        console.error("Error fetching assessments:", error);
+        // Fallback data in case of error
+        setAssessments([
+          {
+            id: "1",
+            name: "联系er1r1@qq.com",
+            deadline: "2024-03-31",
+            status: "pending"
+          },
+        ]);
       }
-    ]);
-  }, []);
+    };
+    
+    fetchAssessments();
+  }, [user]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-8">
@@ -57,7 +60,7 @@ const AssessmentPage = () => {
       <div className="space-y-6">
         {assessments.map((assessment, index) => (
           <div 
-            key={index} 
+            key={assessment.id || index} 
             className="bg-white rounded-lg border border-gray-200 p-6"
           >
             <div className="flex items-center justify-between">
@@ -66,7 +69,7 @@ const AssessmentPage = () => {
                   {assessment.name}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  被评价人: {assessment.reviewee}
+                  被评价人: {assessment.reviewee || 'N/A'}
                 </p>
               </div>
               <Button
