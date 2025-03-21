@@ -10,7 +10,7 @@ interface Assessment {
   name: string;
   reviewee?: string;
   deadline: string;
-  status: 'pending' | 'completed';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
 const AssessmentPage = () => {
@@ -29,9 +29,16 @@ const AssessmentPage = () => {
         const formattedData = data.map((each: any) => ({
           id: each.id || String(Math.random()),
           name: typeof each.test === 'object' && each.test ? each.test.name : 'Unnamed Test',
-          status: each.status || 'pending',
+          status: each.status || 'PENDING',
           reviewee: typeof each.reviewee === 'object' && each.reviewee ? each.reviewee.name : 'Unnamed User',
         }));
+        
+        // Sort assessments - pending and in progress first, completed last
+        formattedData.sort((a, b) => {
+          if (a.status === 'COMPLETED' && b.status !== 'COMPLETED') return 1;
+          if (a.status !== 'COMPLETED' && b.status === 'COMPLETED') return -1;
+          return 0;
+        });
         
         setAssessments(formattedData);
       } catch (error) {
@@ -42,7 +49,7 @@ const AssessmentPage = () => {
             id: "1",
             name: "联系er1r1@qq.com",
             deadline: "2024-03-31",
-            status: "pending"
+            status: "PENDING"
           },
         ]);
       }
@@ -65,25 +72,38 @@ const AssessmentPage = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {assessment.name}
-                </h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {assessment.name}
+                  </h3>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    assessment.status === 'COMPLETED' 
+                      ? 'bg-green-100 text-green-800' 
+                      : assessment.status === 'IN_PROGRESS'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {assessment.status === 'COMPLETED' 
+                      ? '已完成' 
+                      : assessment.status === 'IN_PROGRESS'
+                        ? '进行中'
+                        : '待处理'}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-600">
                   被评价人: {assessment.reviewee || 'N/A'}
                 </p>
               </div>
-              <Button
-                variant="solid"
-                disabled={assessment.status === 'completed'}
-                onPress={() => router.push(`/user/assessment/${assessment.id}`)}
-                className={`px-6 py-2 rounded-lg transition-colors duration-200 ease-in-out
-                  ${assessment.status === 'completed' 
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-400 hover:bg-gray-700 text-gray-100 shadow-sm hover:shadow-md'
-                  }`}
-              >
-                {assessment.status === 'completed' ? '已完成' : '开始测评'}
-              </Button>
+              
+              {assessment.status !== 'COMPLETED' && (
+                <Button
+                  variant="solid"
+                  onPress={() => router.push(`/user/assessment/${assessment.id}`)}
+                  className="px-6 py-2 rounded-lg transition-colors duration-200 ease-in-out bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
+                >
+                  开始测评
+                </Button>
+              )}
             </div>
           </div>
         ))}

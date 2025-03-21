@@ -187,6 +187,11 @@ const sideBarContent: SidebarContentItem[] = [
         url: "/admin/view",
         icon: ScanSearch,
       },
+      {
+        content: "查看评分记录",
+        url: "/admin/dashboard",
+        icon: ScanSearch,
+      },
     ]
   },
   {

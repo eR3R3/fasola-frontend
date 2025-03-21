@@ -176,7 +176,7 @@ const AssignTest = () => {
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
       
-      const data = await response.json();
+        const data = await response.json();
       console.log('Raw API response:', data);
 
       if (!data) {
@@ -184,40 +184,40 @@ const AssignTest = () => {
       }
 
       if (data && data.miniTest && Array.isArray(data.miniTest)) {
-        // Flatten all questions from all mini tests
+          // Flatten all questions from all mini tests
         const questions = data.miniTest.flatMap((miniTest: any) => 
           miniTest.question && Array.isArray(miniTest.question) 
             ? miniTest.question.map((q: any) => ({
-                id: q.id,
-                content: q.content,
-                miniTestId: miniTest.id,
-                miniTestName: miniTest.name
-              }))
-            : []
-        );
+                  id: q.id,
+                  content: q.content,
+                  miniTestId: miniTest.id,
+                  miniTestName: miniTest.name
+                }))
+              : []
+          );
         
         console.log('Processed questions:', questions);
         if (questions.length === 0) {
           console.warn('No questions found in test data');
         }
 
-        setTestQuestions(questions);
-        setSelectedTest(data);
-        
-        // Initialize question assignments
-        const initialAssignments = {};
-        questions.forEach((q: any) => {
-          initialAssignments[q.id] = {};
-          watchReviewers.forEach(reviewer => {
-            if (reviewer.name) {
-              const reviewerId = allPersons.find((p: any) => p.name === reviewer.name)?.id;
-              if (reviewerId) {
-                initialAssignments[q.id][reviewerId] = false;
+          setTestQuestions(questions);
+          setSelectedTest(data);
+          
+          // Initialize question assignments
+          const initialAssignments = {};
+          questions.forEach((q: any) => {
+            initialAssignments[q.id] = {};
+            watchReviewers.forEach(reviewer => {
+              if (reviewer.name) {
+                const reviewerId = allPersons.find((p: any) => p.name === reviewer.name)?.id;
+                if (reviewerId) {
+                  initialAssignments[q.id][reviewerId] = false;
+                }
               }
-            }
+            });
           });
-        });
-        setQuestionAssignments(initialAssignments);
+          setQuestionAssignments(initialAssignments);
       } else {
         console.error('Invalid data structure:', data);
         toast({
@@ -302,7 +302,7 @@ const AssignTest = () => {
           });
           return;
         }
-
+        
         // Get selected questions and their assignments
         const assignments = [];
         
@@ -327,16 +327,17 @@ const AssignTest = () => {
 
           assignments.push({
             questionId: question.id,
+            questionName: question.name,
             content: question.content,
             reviewers: questionReviewers
           });
         });
 
         console.log('Assignments:', assignments);
-        
-        payload = {
+          
+          payload = {
           assignmentType: "person",
-          test: data.test,
+            test: data.test,
           reviewers: reviewerNames,
           reviewees: revieweeNames,
           assignments: assignments
@@ -384,7 +385,7 @@ const AssignTest = () => {
       const result = await response.json();
       console.log('Response from server:', result);
 
-      if (result.message) {
+      if (response.ok === false) {
         toast({
           variant: "destructive",
           title: "错误",
@@ -396,7 +397,7 @@ const AssignTest = () => {
           title: "成功",
           description: "成功分配测试",
         });
-        router.push('/admin/view');
+        // router.push('/admin');
       }
     } catch (error) {
       console.error('Error assigning test:', error);
@@ -421,52 +422,52 @@ const AssignTest = () => {
 
   // Memoize the step components to prevent unnecessary re-renders
   const renderStep1 = React.useMemo(() => (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-6">选择测试</h3>
-      <AutoCompleteField
-        name="test"
-        label="测试名称"
-        items={allTests.map(test => test.name)}
-        description="选择要分配的测试"
-      />
-      <h3 className="text-lg font-medium text-gray-900 mb-6">分配方式</h3>
-      <RadioGroup 
-        defaultValue="person" 
-        className="grid grid-cols-3 gap-4"
-        onValueChange={(value) => setAssignmentType(value)}
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="person" id="person" />
-          <Label htmlFor="person">按人员分配</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="miniclub" id="miniclub" />
-          <Label htmlFor="miniclub">按小组分配</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="position" id="position" />
-          <Label htmlFor="position">按岗位分配</Label>
-        </div>
-      </RadioGroup>
-    </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-6">选择测试</h3>
+            <AutoCompleteField
+              name="test"
+              label="测试名称"
+              items={allTests.map(test => test.name)}
+              description="选择要分配的测试"
+            />
+            <h3 className="text-lg font-medium text-gray-900 mb-6">分配方式</h3>
+            <RadioGroup 
+              defaultValue="person" 
+              className="grid grid-cols-3 gap-4"
+              onValueChange={(value) => setAssignmentType(value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="person" id="person" />
+                <Label htmlFor="person">按人员分配</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="miniclub" id="miniclub" />
+                <Label htmlFor="miniclub">按小组分配</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="position" id="position" />
+                <Label htmlFor="position">按岗位分配</Label>
+              </div>
+            </RadioGroup>
+          </div>
   ), [allTests]);
 
   const renderStep2 = React.useMemo(() => (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-6">选择人员</h3>
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-6">选择人员</h3>
       {assignmentType === "person" && (
         <div className='flex gap-6 mb-6'>
-          <AutoCompleteGroup<formDataType>
-            name="reviewer"
-            label="评价者"
-            items={allPersons.map(person => person.name)}
-          />
-          <AutoCompleteGroup<formDataType>
-            name="reviewee"
-            label="被评价者"
-            items={allPersons.map(person => person.name)}
-          />
-        </div>
+                <AutoCompleteGroup<formDataType>
+                  name="reviewer"
+                  label="评价者"
+                  items={allPersons.map(person => person.name)}
+                />
+                <AutoCompleteGroup<formDataType>
+                  name="reviewee"
+                  label="被评价者"
+                  items={allPersons.map(person => person.name)}
+                />
+              </div>
       )}
       {assignmentType === "miniclub" && (
         <AutoCompleteField
@@ -484,7 +485,7 @@ const AssignTest = () => {
           description="选择要分配测试的岗位"
         />
       )}
-    </div>
+                  </div>
   ), [assignmentType, allPersons, allMiniClubs, allPositions]);
 
   const renderStep3 = React.useMemo(() => (
@@ -493,25 +494,25 @@ const AssignTest = () => {
         <h3 className="text-lg font-medium text-gray-900 mb-6">分配问题</h3>
         {testQuestions.length > 0 ? (
           <div className="space-y-6">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-sm text-gray-500">
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-sm text-gray-500">
                 为每个问题选择评价者
               </p>
-            </div>
-            
-            <Card className="p-4 max-h-[500px] overflow-y-auto border-2 border-blue-200">
-              {isLoading ? (
-                <div className="flex justify-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {testQuestions.map((question: any) => (
+                      </div>
+                      
+                      <Card className="p-4 max-h-[500px] overflow-y-auto border-2 border-blue-200">
+                        {isLoading ? (
+                          <div className="flex justify-center py-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                          </div>
+                        ) : (
+                          <div className="space-y-6">
+                            {testQuestions.map((question: any) => (
                     <div key={question.id} className="border-b pb-4 last:border-b-0">
                       <div className="mb-4">
                         <h4 className="font-medium text-base mb-1">{question.content}</h4>
                         <p className="text-xs text-gray-500">来自: {question.miniTestName}</p>
-                      </div>
+                                </div>
                       
                       <div className="ml-4">
                         <h5 className="text-sm font-medium text-gray-700 mb-2">选择评价者：</h5>
@@ -523,36 +524,36 @@ const AssignTest = () => {
                                 key={`${question.id}-${reviewerId}-${reviewerIndex}`} 
                                 className="flex items-center space-x-2"
                               >
-                                <Checkbox 
+                                            <Checkbox 
                                   id={`${question.id}-${reviewerId}-${reviewerIndex}`}
                                   checked={questionAssignments[question.id]?.[reviewerId] || false}
-                                  onCheckedChange={(checked) => {
-                                    handleQuestionAssignment(question.id, reviewerId, checked === true);
-                                  }}
-                                />
-                                <label 
+                                              onCheckedChange={(checked) => {
+                                                  handleQuestionAssignment(question.id, reviewerId, checked === true);
+                                              }}
+                                            />
+                                            <label 
                                   htmlFor={`${question.id}-${reviewerId}-${reviewerIndex}`}
-                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                  {reviewer.name}
-                                </label>
-                              </div>
+                                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                              {reviewer.name}
+                                            </label>
+                                          </div>
                             ) : null;
                           })}
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                                      ))}
+                                    </div>
               )}
             </Card>
           </div>
         ) : (
           <div className="text-center text-gray-500">
             没有可分配的问题
-          </div>
-        )}
-      </div>
+                                  </div>
+                                )}
+                              </div>
     )
   ), [assignmentType, testQuestions, isLoading, watchReviewers, allPersons, questionAssignments]);
 
@@ -605,60 +606,122 @@ const AssignTest = () => {
               </div>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-md font-medium mb-4">问题分配详情</h4>
-              <div className="space-y-4">
-                {testQuestions.map((question: any) => (
-                  selectedQuestions[question.id] && (
-                    <div key={question.id} className="border-b pb-4 last:border-b-0">
-                      <p className="font-medium mb-2">{question.content}</p>
-                      <p className="text-sm text-gray-500 mb-2">来自: {question.miniTestName}</p>
-                      <div className="ml-4">
-                        <h6 className="text-sm font-medium text-gray-600 mb-1">指定评价者：</h6>
-                        <div className="flex flex-wrap gap-2">
-                          {watchReviewers.map((reviewer, reviewerIndex) => {
-                            const reviewerId = reviewer.name ? allPersons.find((p: any) => p.name === reviewer.name)?.id : null;
-                            return reviewer.name && reviewerId && questionAssignments[question.id]?.[reviewerId] ? (
-                              <span 
-                                key={`${question.id}-${reviewerId}-${reviewerIndex}`} 
-                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                              >
-                                {reviewer.name}
-                              </span>
-                            ) : null;
-                          })}
+            {selectedTest && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-md font-medium mb-2">测试结构</h4>
+                <div className="mb-4">
+                  <h5 className="text-sm font-medium text-gray-600 mb-2">测试权重比例：</h5>
+                  <div className="flex items-center gap-2 ml-4 mb-2">
+                    {selectedTest.proportion && selectedTest.proportion.map((prop, index) => (
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
+                        部分{index + 1}: {(prop * 100).toFixed(0)}%
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <h5 className="text-sm font-medium text-gray-600 mb-2">小测试组成：</h5>
+                  <div className="space-y-3 ml-4">
+                    {selectedTest.miniTest && selectedTest.miniTest.map((miniTest, miniTestIndex) => (
+                      <div key={miniTest.id} className="border-l-2 border-gray-300 pl-4 py-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{miniTest.name}</span>
+                          <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+                            部分{miniTestIndex + 1}
+                          </span>
+                        </div>
+                        {miniTest.proportion && (
+                          <div className="text-xs text-gray-500 mb-2 mt-1">
+                            权重比例: {miniTest.proportion.map(p => `${(p * 100).toFixed(0)}%`).join(" : ")}
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 mb-1">
+                          包含 {miniTest.question ? miniTest.question.length : 0} 个问题
                         </div>
                       </div>
-                    </div>
-                  )
-                ))}
+                    ))}
+                  </div>
+                </div>
               </div>
+            )}
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-md font-medium mb-4">问题分配详情</h4>
+              
+              {/* Group questions by mini-test */}
+              {selectedTest && selectedTest.miniTest && selectedTest.miniTest.map((miniTest, miniTestIndex) => {
+                const miniTestQuestions = testQuestions.filter(q => q.miniTestId === miniTest.id && selectedQuestions[q.id]);
+                
+                if (miniTestQuestions.length === 0) return null;
+                
+                return (
+                  <div key={miniTest.id} className="mb-6 last:mb-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h5 className="text-sm font-semibold">{miniTest.name}</h5>
+                      <span className="text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+                        部分{miniTestIndex + 1}
+                      </span>
+                      {miniTest.proportion && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                          权重: {miniTest.proportion.map(p => `${(p * 100).toFixed(0)}%`).join(" : ")}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-4 ml-4">
+                      {miniTestQuestions.map((question) => (
+                        <div key={question.id} className="border-b pb-4 last:border-b-0">
+                          <p className="font-medium mb-2">{question.content}</p>
+                          
+                          <div className="ml-4">
+                            <h6 className="text-sm font-medium text-gray-600 mb-1">指定评价者：</h6>
+                            <div className="flex flex-wrap gap-2">
+                              {watchReviewers.map((reviewer, reviewerIndex) => {
+                                const reviewerId = reviewer.name ? allPersons.find((p: any) => p.name === reviewer.name)?.id : null;
+                                return reviewer.name && reviewerId && questionAssignments[question.id]?.[reviewerId] ? (
+                                  <span 
+                                    key={`${question.id}-${reviewerId}-${reviewerIndex}`} 
+                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                  >
+                                    {reviewer.name}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </>
-        )}
+          )}
 
-        {assignmentType === "miniclub" && (
+          {assignmentType === "miniclub" && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">小组信息</h4>
             <div>
               <span className="text-gray-600">选择的小组：</span>
               <span className="font-medium">{methods.watch("miniclub")}</span>
             </div>
-          </div>
-        )}
+            </div>
+          )}
 
-        {assignmentType === "position" && (
+          {assignmentType === "position" && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">岗位信息</h4>
             <div>
               <span className="text-gray-600">选择的岗位：</span>
               <span className="font-medium">{methods.watch("position")}</span>
             </div>
-          </div>
-        )}
+            </div>
+          )}
       </div>
     </div>
-  ), [assignmentType, watchTest, watchReviewers, methods, testQuestions, selectedQuestions, questionAssignments]);
+  ), [assignmentType, watchTest, watchReviewers, methods, testQuestions, selectedQuestions, questionAssignments, selectedTest, allPersons]);
 
   return (
     <FormProvider {...methods}>
@@ -683,9 +746,9 @@ const AssignTest = () => {
               </Button>
             )}
             {currentStep === 4 && (
-              <Button type="submit" variant="shadow">
-                分配
-              </Button>
+            <Button type="submit" variant="shadow"> 
+              分配
+            </Button>
             )}
           </div>
         </form>
